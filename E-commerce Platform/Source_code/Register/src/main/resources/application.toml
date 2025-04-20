@@ -7,6 +7,10 @@ security.authentication = 'cookie'
 driver-class-name = 'org.postgresql.Driver'
 db-type = 'postgres'
 
+[datasources.default.test]
+driver-class-name = 'org.h2.Driver'
+db-type = 'h2'
+
 [micronaut.router.static-resources.jsonschema]
 paths = 'classpath:META-INF/schemas'
 mapping = '/schemas/**'
@@ -22,3 +26,19 @@ mapping = '/rapidoc/**'
 [micronaut.router.static-resources.swagger-ui]
 paths = 'classpath:META-INF/swagger/views/swagger-ui'
 mapping = '/swagger-ui/**'
+
+[micronaut.security.hash-configuration]
+type = "argon2id"
+memory = 65536      
+parallelism = 4     
+iterations = 3      
+hashLength = 32     
+saltLength = 32
+
+[micronaut.security.roles]
+admin = ["accounts:read", "accounts:create", "accounts:update", "accounts:delete", "system:read", "system:create", "system:update", "system:delete"]
+user = ["accounts:read", "accounts:update", "accounts:delete"]
+
+[micronaut.security.token.email.validation]
+codeLength = 6
+expirationTimeMilisecons = 3000000

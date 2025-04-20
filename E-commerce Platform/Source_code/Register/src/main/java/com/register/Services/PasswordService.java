@@ -1,5 +1,7 @@
 package com.register.Services;
 
+import de.mkammerer.argon2.Argon2;
+
 import jakarta.inject.Singleton;
 import java.util.regex.Pattern;
 
@@ -8,15 +10,20 @@ public class PasswordService {
 
     private static final Pattern STRONG_PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$");
 
-    // TODO: implement the PasswordService class with necessary fields and methods
-    public boolean isStrong(String password) {
-        return STRONG_PASSWORD_PATTERN.matcher(password).matches();
-    }
-
-    // TODO: implement the PasswordService class with necessary fields and methods
+    /**
+     * Hashes a password using Argon2 algorithm.
+     *
+     * @param password       the password to hash
+     * @param hashedPassword the hashed password to compare against
+     * @return the hashed password
+     */
     public boolean verifyPassword(String password, String hashedPassword) {
-        // Implement your password verification logic here
-        return password.equals(hashedPassword); // Placeholder, replace with actual verification
+        Argon2 argon2 = de.mkammerer.argon2.Argon2Factory.create();
+        try {
+            return argon2.verify(hashedPassword, password.toCharArray());
+        } finally {
+            argon2.wipeArray(password.toCharArray());
+        }
     }
 
 }
