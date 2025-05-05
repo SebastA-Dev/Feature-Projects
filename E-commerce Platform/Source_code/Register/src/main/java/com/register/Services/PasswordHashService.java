@@ -6,15 +6,12 @@ import de.mkammerer.argon2.Argon2;
 import de.mkammerer.argon2.Argon2Factory;
 import jakarta.inject.Singleton;
 
-/**
- * Service for hashing passwords using Argon2 algorithm.
- */
 @Singleton
-public class HashService {
+public class PasswordHashService {
 
     private final HashConfig hashConfig;
 
-    public HashService(HashConfig hashConfig) {
+    public PasswordHashService(HashConfig hashConfig) {
         this.hashConfig = hashConfig;
     }
 

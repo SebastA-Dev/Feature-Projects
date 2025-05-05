@@ -1,6 +1,0 @@
-applicationType: default
-defaultPackage: com.authorization
-testFramework: spock
-sourceLanguage: java
-buildTool: maven
-features: [amazon-cloudwatch-logging, annotation-api, app-name, groovy-maven-plus-plugin, http-client-jdk, java, java-application, jdbc-hikari, json-schema, json-schema-validation, kafka, logback, maven, maven-enforcer-plugin, micronaut-aot, micronaut-http-validation, netty-server, openapi, postgres, rabbitmq, rapidoc, readme, security-annotations, security-oauth2, serialization-jackson, shade, spock, static-resources, swagger-ui, test-resources, toml, toml-build, validation]

@@ -10,8 +10,8 @@ import com.register.DB.Repository.UserRepository;
 import com.register.DTO.Request.UserValidationRequest;
 import com.register.DTO.Response.UserValidationResponse;
 
-import io.micronaut.email.BodyType;
 import io.micronaut.email.Email;
+import io.micronaut.email.BodyType;
 import io.micronaut.email.EmailSender;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
@@ -19,7 +19,6 @@ import jakarta.inject.Singleton;
 @Singleton
 public class EmailService {
 
-    private static final String EMAIL_REGEX = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
     private final EmailSender<?, ?> emailSender;
 
     @Inject
@@ -30,71 +29,69 @@ public class EmailService {
     }
 
     /**
-     * Sends a validation code email to the user.
-     *
-     * @param email The user's email address.
+     * Envía un código de validación al correo del usuario.
      */
-    public void sendValidationCode(String email) {
-        if (!isValid(email)) {
+    public void sendValidationCode(String toAddress) {
+        if (!isValid(toAddress)) {
             throw new IllegalArgumentException("Invalid email format");
         }
 
         int code = generateValidationCode();
-        userRepository.saveUserValidationCode(email, code);
+        userRepository.saveUserValidationCode(toAddress, code);
 
         Email.Builder emailBuilder = Email.builder()
-                .to(email)
+                // Remitente obligatorio: puedes parametrizarlo en application.yml
+                .from("no-reply@tu-dominio.com")
+                .to(toAddress)
                 .subject("Your Verification Code")
-                .body("Dear user,\n\nYour verification code is: " + code + "\n\nThank you.", BodyType.TEXT);
+                .body(
+                        "Dear user,\n\nYour verification code is: " + code + "\n\nThank you.",
+                        BodyType.TEXT);
 
+        // send acepta un Email.Builder
         emailSender.send(emailBuilder);
     }
 
     /**
-     * Resends the validation code to the user's email address.
-     *
-     * @param email The user's email address.
+     * Reenvía el código de validación (regenera y actualiza conteo de intentos).
      */
-    public void resendValidationCode(String email) {
+    public void resendValidationCode(String toAddress) {
+        if (!isValid(toAddress)) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
+
         int code = generateValidationCode();
-        int attempts = userRepository.getUserValidationCodeTryCount(email) - 1;
+        userRepository.saveUserValidationCode(toAddress, code);
 
-        userRepository.saveUserValidationCode(email, code);
-        userRepository.updateUserValidationTryCount(email, attempts);
+        // Opcional: actualizar aquí el contador de reintentos
+        // userRepository.updateUserValidationTryCount(toAddress, newAttempts);
 
-        sendValidationCode(email);
+        // Reutiliza el método que construye y envía el email
+        sendValidationCode(toAddress);
     }
 
-    /**
-     * Validates the email code entered by the user.
-     *
-     * @param userValidationRequest The request containing the email and validation
-     *                              code.
-     * @return UserValidationResponse The response indicating success or failure.
-     */
-    public UserValidationResponse validateEmailCode(UserValidationRequest userValidationRequest) {
-        int code = userRepository.getUserValidationCode(userValidationRequest.getEmail());
-        String instanceTime = userRepository.getValidationCodeInstanceTime(userValidationRequest.getEmail());
+    public UserValidationResponse validateEmailCode(UserValidationRequest req) {
+        int codeStored = userRepository.getUserValidationCode(req.getEmail());
+        String instanceTime = userRepository.getValidationCodeInstanceTime(req.getEmail());
 
         Map<String, String> fieldErrors = new HashMap<>();
 
-        if (code == -1) {
+        if (codeStored == -1) {
             fieldErrors.put("code", "Code doesn't exist");
             return new UserValidationResponse("The code doesn't exist or is incorrect", 400, fieldErrors);
         }
 
-        if (code != userValidationRequest.getCode()) {
+        if (codeStored != req.getCode()) {
             fieldErrors.put("code", "Code doesn't match");
             return new UserValidationResponse("The code doesn't match", 400, fieldErrors);
         }
 
         if (instanceTime != null) {
             try {
-                LocalDateTime codeTime = LocalDateTime.parse(instanceTime,
+                LocalDateTime codeTime = LocalDateTime.parse(
+                        instanceTime,
                         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-                LocalDateTime currentTime = LocalDateTime.now();
-
-                if (Duration.between(codeTime, currentTime).toMinutes() > 5) {
+                if (Duration.between(codeTime, LocalDateTime.now()).toMinutes() > 5) {
                     fieldErrors.put("code", "Code has expired");
                     return new UserValidationResponse("The code has expired", 400, fieldErrors);
                 }
@@ -110,22 +107,11 @@ public class EmailService {
         return new UserValidationResponse("Code validated successfully", 200, null);
     }
 
-    /**
-     * Checks if an email is valid.
-     *
-     * @param email The email to validate.
-     * @return True if the email is valid, false otherwise.
-     */
     public Boolean isValid(String email) {
-        return email.matches(EMAIL_REGEX);
+        return email.matches("^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$");
     }
 
-    /**
-     * Generates a random 6-digit validation code.
-     *
-     * @return int The generated code.
-     */
     private int generateValidationCode() {
-        return (int) (Math.random() * 900000) + 100000; // Generates a 6-digit code
+        return (int) (Math.random() * 900000) + 100000;
     }
 }

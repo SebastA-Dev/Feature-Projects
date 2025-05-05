@@ -1,0 +1,17 @@
+services:
+  db:
+    image: mysql
+    container_name: register-db
+    restart: unless-stopped
+    environment:      
+      MYSQL_ROOT_PASSWORD: 12345678_should_be_changed
+      MYSQL_DATABASE: register
+      MYSQL_USER: root_should_be_changed
+      MYSQL_PASSWORD: 12345678_should_be_changed
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysql", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}", "-e", "SELECT 1;"]
+      interval: 5s
+      timeout: 10s
+      retries: 10

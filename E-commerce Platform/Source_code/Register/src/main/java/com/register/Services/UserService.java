@@ -9,16 +9,12 @@ import com.register.DTO.Request.UserRegistrationRequest;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
-/**
- * Service class for managing user-related operations.
- */
 @Singleton
 public class UserService {
-
     private String hashedPassword;
 
     @Inject
-    private HashService hashService;
+    private PasswordHashService hashService;
 
     @Inject
     private UserRepository userRepository;

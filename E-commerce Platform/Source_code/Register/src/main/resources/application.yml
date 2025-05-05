@@ -1,0 +1,31 @@
+micronaut:
+  application:
+    name: register
+  router:
+    static-resources:
+      jsonschema:
+        paths: classpath:META-INF/schemas
+        mapping: /schemas/**
+
+datasources:
+  default:
+    url: jdbc:mysql://localhost:3306/register?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root_should_be_changed
+    password: 12345678_should_be_changed
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    maximum-pool-size: 10
+    minimum-idle: 2
+    idle-timeout: 600000
+    max-lifetime: 1800000
+
+
+micronaut:
+  security:
+    enabled: true        
+    hash-configuration:
+      type: Argon2id     
+      iterations: 3      
+      memory: 65536      
+      parallelism: 1     
+      hash-length: 32    
+      salt-length: 16    

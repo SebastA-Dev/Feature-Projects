@@ -11,20 +11,18 @@ import io.micronaut.http.MediaType;
 import io.micronaut.http.annotation.Body;
 import io.micronaut.http.annotation.Controller;
 import io.micronaut.http.annotation.Delete;
-import io.micronaut.http.annotation.Get;
 import io.micronaut.http.annotation.Post;
+import jakarta.inject.Inject;
 import jakarta.validation.Valid;
 
 @Controller("/v1/api/")
-public class UserRegistration {
+public class UserRegistrationController {
 
-    private final UserService userService;
+    @Inject
+    private UserService userService;
+
     private String userIpAddress;
     private Map<String, Boolean> userExistenceResponse = new HashMap<>();
-
-    public UserRegistration(UserService userService) {
-        this.userService = userService;
-    }
 
     /**
      * * Method to register a user

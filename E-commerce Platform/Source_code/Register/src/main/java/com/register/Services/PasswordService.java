@@ -1,14 +1,10 @@
 package com.register.Services;
 
 import de.mkammerer.argon2.Argon2;
-
 import jakarta.inject.Singleton;
-import java.util.regex.Pattern;
 
 @Singleton
 public class PasswordService {
-
-    private static final Pattern STRONG_PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$");
 
     /**
      * Hashes a password using Argon2 algorithm.
@@ -25,5 +21,4 @@ public class PasswordService {
             argon2.wipeArray(password.toCharArray());
         }
     }
-
 }
