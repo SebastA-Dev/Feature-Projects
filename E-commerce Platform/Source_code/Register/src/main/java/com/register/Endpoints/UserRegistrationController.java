@@ -1,4 +1,4 @@
-package com.register.Controllers;
+package com.register.Endpoints;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,7 +22,8 @@ public class UserRegistrationController {
     private UserService userService;
 
     private String userIpAddress;
-    private Map<String, Boolean> userExistenceResponse = new HashMap<>();
+    private Boolean userExistenceResponse = false;
+    private Boolean register = false;
 
     /**
      * * Method to register a user
@@ -31,7 +32,10 @@ public class UserRegistrationController {
      * @return RegistrationResponse the registration response object
      */
     @Post(value = "/post/user-registration", consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
-    public RegistrationResponse registerUser(@Body @Valid UserRegistrationRequest userRegistrationRequest) {
+    public RegistrationResponse registerUser(@Body @Valid UserRegistrationRequest userRegistrationRequest,
+            io.micronaut.http.HttpRequest<?> request) {
+
+        userIpAddress = request.getRemoteAddress().getHostString();
 
         Map<String, String> fieldErrors = new HashMap<>();
         Map<String, String> userExistenceData = new HashMap<>();
@@ -41,22 +45,17 @@ public class UserRegistrationController {
 
         userExistenceResponse = userService.getUserExistence(userExistenceData);
 
+        if (userExistenceResponse) {
+            return new RegistrationResponse(400, "User exists please try again",
+                    Map.of("error", "User already exists"));
+        }
+
         if (!userRegistrationRequest.getPassword().equals(userRegistrationRequest.getConfirmPassword())) {
             fieldErrors.put("confirmPassword", "Passwords do not match");
             return new RegistrationResponse(400, "Validation failed for the request", fieldErrors);
         }
 
-        if (userExistenceResponse.get("username")) {
-            fieldErrors.put("username", "Username already exists");
-            return new RegistrationResponse(400, "Validation failed for the request", fieldErrors);
-        }
-
-        if (userExistenceResponse.get("email")) {
-            fieldErrors.put("email", "Email already exists");
-            return new RegistrationResponse(400, "Validation failed for the request", fieldErrors);
-        }
-
-        Boolean register = userService.registerUser(userRegistrationRequest, userIpAddress);
+        register = userService.registerUser(userRegistrationRequest, userIpAddress);
         if (!register) {
             fieldErrors.put("error", "User registration failed");
             return new RegistrationResponse(500, "User registration failed", fieldErrors);
@@ -64,15 +63,15 @@ public class UserRegistrationController {
         return new RegistrationResponse("User registered successfully", 200);
     }
 
-    // TODO: Implement logic for Redis (Services, repository, etc.) and then, the
-    // implementation of this endpoint
+    // TODO: Before this implementation, we need to implement the logic for cache
+    // (Dependance on Redis service)
     @Delete("/delete/user-registration")
     public String deleteUserRegistration(String username) {
         return "User registration deleted successfully";
     }
 
-    // TODO: Implement logic for Redis (Services, repository, etc.) and then, the
-    // implementation of this endpoint
+    // TODO: Before this implementation, we need to implement the logic for cache
+    // (Dependance on Redis service)
     @Post("/post/user-registration/temporary-data")
     public String saveTemporaryData(@Body Map<String, String> temporaryData) {
         return null;

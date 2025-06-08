@@ -1,12 +1,14 @@
 package com.register.DB.Repository;
 
-import java.sql.Types;
-
-import org.springframework.jdbc.core.JdbcTemplate;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 import com.register.DTO.Request.UserRegistrationRequest;
 
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import javax.sql.DataSource;
 
 /**
  * Repository class for managing user-related database operations.
@@ -14,11 +16,8 @@ import jakarta.inject.Singleton;
 @Singleton
 public class UserRepository {
 
-    private final JdbcTemplate jdbcTemplate;
-
-    public UserRepository(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
+    @Inject
+    private DataSource dataSource;
 
     // -------------------------------------------------------------------------
     // User Management
@@ -32,21 +31,46 @@ public class UserRepository {
      * @param userIpAddress The IP address of the user.
      */
     public void saveUser(UserRegistrationRequest user, String password, String userIpAddress) {
-        String sql = "INSERT INTO users (name, surname, email, username, password) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO User (name, surname, email, username, password) VALUES (?, ?, ?, ?, ?)";
 
-        Object[] args = { user.getName(), user.getSurname(), user.getEmail(), user.getUsername(), password };
-        int[] argTypes = { Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR };
+        try (Connection connection = dataSource.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)) {
 
-        int rowsAffected = jdbcTemplate.update(sql, args, argTypes);
+            statement.setString(1, user.getName());
+            statement.setString(2, user.getSurname());
+            statement.setString(3, user.getEmail());
+            statement.setString(4, user.getUsername());
+            statement.setString(5, password);
 
-        if (rowsAffected > 0) {
-            String getUserIdSql = "SELECT id FROM users WHERE username = ?";
-            Integer userId = jdbcTemplate.queryForObject(getUserIdSql, new Object[] { user.getUsername() },
-                    new int[] { Types.VARCHAR }, Integer.class);
+            int rowsAffected = statement.executeUpdate();
 
-            if (userId != null) {
-                saveUserIpAddress(userIpAddress, userId);
+            if (rowsAffected > 0) {
+                saveUserIpAddress(userIpAddress, user.getUsername());
             }
+        } catch (Exception e) {
+            throw new RuntimeException("Error while saving user: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Saves the user's IP address in the database.
+     *
+     * @param userIpAddress The IP address to save.
+     * @param username      The username of the user.
+     */
+    private void saveUserIpAddress(String userIpAddress, String username) {
+        String sql = "INSERT INTO UserIPAddress (userId, ipAddress, DateTime) " +
+                "SELECT idUser, ?, NOW() FROM User WHERE username = ?";
+
+        try (Connection connection = dataSource.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, userIpAddress);
+            statement.setString(2, username);
+
+            statement.executeUpdate();
+        } catch (Exception e) {
+            throw new RuntimeException("Error while saving user IP address: " + e.getMessage(), e);
         }
     }
 
@@ -57,11 +81,23 @@ public class UserRepository {
      * @return boolean True if the user exists, false otherwise.
      */
     public boolean findUserByUsername(String username) {
-        String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
-        Object[] args = { username };
-        int[] argTypes = { Types.VARCHAR };
-        Integer count = jdbcTemplate.queryForObject(sql, args, argTypes, Integer.class);
-        return count != null && count > 0;
+        String sql = "SELECT COUNT(*) FROM User WHERE username = ?";
+
+        try (Connection connection = dataSource.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setString(1, username);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1) > 0;
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Error while checking username: " + e.getMessage(), e);
+        }
+
+        return false;
     }
 
     /**
@@ -71,111 +107,22 @@ public class UserRepository {
      * @return boolean True if the user exists, false otherwise.
      */
     public boolean findUserByEmail(String email) {
-        String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
-        Object[] args = { email };
-        int[] argTypes = { Types.VARCHAR };
-        Integer count = jdbcTemplate.queryForObject(sql, args, argTypes, Integer.class);
-        return count != null && count > 0;
-    }
+        String sql = "SELECT COUNT(*) FROM User WHERE email = ?";
 
-    // -------------------------------------------------------------------------
-    // Validation Code Management
-    // -------------------------------------------------------------------------
+        try (Connection connection = dataSource.getConnection();
+                PreparedStatement statement = connection.prepareStatement(sql)) {
 
-    /**
-     * Saves the user's IP address in the database.
-     *
-     * @param userIpAddress The IP address to save.
-     * @param userId        The ID of the user.
-     */
-    private void saveUserIpAddress(String userIpAddress, int userId) {
-        String sql = "INSERT INTO user_ip_addresss (user_id, ip_address) VALUES (?, ?)";
-        Object[] args = { userId, userIpAddress };
-        int[] argTypes = { Types.INTEGER, Types.VARCHAR };
-        jdbcTemplate.update(sql, args, argTypes);
-    }
+            statement.setString(1, email);
 
-    /**
-     * Saves a validation code for a user.
-     *
-     * @param email The user's email address.
-     * @param code  The validation code to save.
-     */
-    public void saveUserValidationCode(String email, int code) {
-        String sql = "UPDATE users SET validation_code = ? WHERE email = ?";
-        Object[] args = { code, email };
-        int[] argTypes = { Types.INTEGER, Types.VARCHAR };
-        jdbcTemplate.update(sql, args, argTypes);
-    }
-
-    /**
-     * Deletes the validation code for a user.
-     *
-     * @param email The user's email address.
-     */
-    public void deleteUserValidationCode(String email) {
-        String sql = "UPDATE users SET validation_code = NULL WHERE email = ?";
-        Object[] args = { email };
-        int[] argTypes = { Types.VARCHAR };
-        jdbcTemplate.update(sql, args, argTypes);
-    }
-
-    /**
-     * Retrieves the number of validation attempts for a user.
-     *
-     * @param email The user's email address.
-     * @return int The number of validation attempts.
-     */
-    public int getUserValidationCodeTryCount(String email) {
-        String sql = "SELECT validation_try_count FROM users WHERE email = ?";
-        Object[] args = { email };
-        int[] argTypes = { Types.VARCHAR };
-        return jdbcTemplate.queryForObject(sql, args, argTypes, Integer.class);
-    }
-
-    /**
-     * Updates the number of validation attempts for a user.
-     *
-     * @param email    The user's email address.
-     * @param tryCount The number of attempts to save.
-     */
-    public int getUserValidationCode(String email) {
-        String sql = "SELECT validation_code FROM users WHERE email = ?";
-        Object[] args = { email };
-        int[] argTypes = { Types.VARCHAR };
-        return jdbcTemplate.queryForObject(sql, args, argTypes, Integer.class);
-    }
-
-    /**
-     * Updates the number of validation attempts for a user.
-     *
-     * @param email    The user's email address.
-     * @param tryCount The number of attempts to save.
-     */
-    public void updateUserValidationTryCount(String email, int tryCount) {
-        String sql = "UPDATE users SET validation_try_count = ? WHERE email = ?";
-        Object[] args = { tryCount, email };
-        int[] argTypes = { Types.INTEGER, Types.VARCHAR };
-        jdbcTemplate.update(sql, args, argTypes);
-    }
-
-    /**
-     * Retrieves the instance time of the validation code for a user.
-     *
-     * @param email The user's email address.
-     * @return String The instance time of the validation code as a string (or null
-     *         if not found).
-     */
-    public String getValidationCodeInstanceTime(String email) {
-        String sql = "SELECT instance_time FROM users WHERE email = ?";
-        Object[] args = { email };
-        int[] argTypes = { Types.VARCHAR };
-
-        try {
-            return jdbcTemplate.queryForObject(sql, args, argTypes, String.class);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt(1) > 0;
+                }
+            }
         } catch (Exception e) {
-            // Handle cases where no result is found or other exceptions occur
-            return null;
+            throw new RuntimeException("Error while checking email: " + e.getMessage(), e);
         }
+
+        return false;
     }
 }

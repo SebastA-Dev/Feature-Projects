@@ -11,10 +11,9 @@ import jakarta.inject.Singleton;
 
 @Singleton
 public class UserService {
-    private String hashedPassword;
 
     @Inject
-    private PasswordHashService hashService;
+    private HashService hashService;
 
     @Inject
     private UserRepository userRepository;
@@ -32,7 +31,7 @@ public class UserService {
      */
     public Boolean registerUser(UserRegistrationRequest userRegistrationRequest, String userIpAddress) {
         try {
-            hashedPassword = hashService.hash(userRegistrationRequest.getPassword());
+            String hashedPassword = hashService.hash(userRegistrationRequest.getPassword());
             userRepository.saveUser(userRegistrationRequest, hashedPassword, userIpAddress);
             return true;
         } catch (Exception e) {
@@ -51,17 +50,19 @@ public class UserService {
      * @return Map<String, Boolean> A map indicating whether the username and email
      *         exist.
      */
-    public Map<String, Boolean> getUserExistence(Map<String, String> userRegistrationData) {
+    public boolean getUserExistence(Map<String, String> userRegistrationData) {
         String username = userRegistrationData.get("username");
         String email = userRegistrationData.get("email");
 
         boolean usernameExists = userRepository.findUserByUsername(username);
         boolean emailExists = userRepository.findUserByEmail(email);
-
-        Map<String, Boolean> userExistence = new HashMap<>();
-        userExistence.put("username", usernameExists);
-        userExistence.put("email", emailExists);
-        return userExistence;
+        if (usernameExists) {
+            return true;
+        }
+        if (emailExists) {
+            return true;
+        }
+        return false;
     }
 
     // -------------------------------------------------------------------------
@@ -91,7 +92,7 @@ public class UserService {
     public void deleteUserValidationCode(String email) {
         boolean userExists = userRepository.findUserByEmail(email);
         if (userExists) {
-            userRepository.deleteUserValidationCode(email);
+            userRepository.saveUserValidationCode(email, 0); // Set validation code to 0 (or null if supported)
         } else {
             throw new RuntimeException("User not found with email: " + email);
         }
@@ -106,7 +107,7 @@ public class UserService {
     public int getUserValidationCodeTryCount(String email) {
         boolean userExists = userRepository.findUserByEmail(email);
         if (userExists) {
-            return userRepository.getUserValidationCodeTryCount(email);
+            return userRepository.getUserValidationCode(email);
         } else {
             throw new RuntimeException("User not found with email: " + email);
         }
@@ -121,16 +122,22 @@ public class UserService {
     public void updateUserValidationCodeTryCount(String email, int tryCount) {
         boolean userExists = userRepository.findUserByEmail(email);
         if (userExists) {
-            userRepository.updateUserValidationTryCount(email, tryCount);
+            userRepository.saveUserValidationCode(email, tryCount);
         } else {
             throw new RuntimeException("User not found with email: " + email);
         }
     }
 
-    public String getValidationCodeInstanceTime(String email) {
+    /**
+     * Retrieves the validation code instance time for a user.
+     *
+     * @param email The user's email address.
+     * @return int The validation code.
+     */
+    public int getValidationCodeInstanceTime(String email) {
         boolean userExists = userRepository.findUserByEmail(email);
         if (userExists) {
-            return userRepository.getValidationCodeInstanceTime(email);
+            return userRepository.getUserValidationCode(email);
         } else {
             throw new RuntimeException("User not found with email: " + email);
         }

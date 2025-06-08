@@ -3,8 +3,10 @@ package com.register.DTO.Response;
 import java.util.Map;
 
 import io.micronaut.core.annotation.Introspected;
+import io.micronaut.serde.annotation.Serdeable;
 
 @Introspected
+@Serdeable
 public class RegistrationResponse implements CustomResponse {
     private String message;
     private int status;

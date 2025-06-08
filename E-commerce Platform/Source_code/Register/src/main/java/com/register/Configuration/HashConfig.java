@@ -4,14 +4,14 @@ import io.micronaut.context.annotation.ConfigurationProperties;
 
 @ConfigurationProperties("micronaut.security.hash-configuration")
 public class HashConfig {
-    private String type;
+    private String type = "ARGON2id";
     private int iterations;
     private int memory;
     private int parallelism;
     private int hashLength;
     private int saltLength;
 
-    // Getters and Setters
+    // Getters y Setters
     public String getType() {
         return type;
     }
