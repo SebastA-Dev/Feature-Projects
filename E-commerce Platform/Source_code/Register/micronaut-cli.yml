@@ -1,0 +1,6 @@
+applicationType: default
+defaultPackage: com.register
+testFramework: junit
+sourceLanguage: java
+buildTool: maven
+features: [annotation-api, app-name, http-client, java, java-application, jdbc-hikari, json-schema, junit, junit-params, logback, maven, maven-enforcer-plugin, micronaut-aot, micronaut-http-validation, micronaut-test-rest-assured, mysql, netty-server, readme, security, security-annotations, security-csrf, serialization-jackson, shade, static-resources, test-resources, yaml, yaml-build]
