@@ -5,6 +5,7 @@ micronaut:
       jsonschema:
         paths: classpath:META-INF/schemas
         mapping: /schemas/**
+
   security:
     hash-configuration:
       type: ARGON2id     
@@ -12,11 +13,9 @@ micronaut:
       memory: 65536      
       parallelism: 4
       hash-length: 64    
-      salt-length: 16    
+      salt-length: 16     
   server:
     port: 8080
-
-
 
 datasources:
   default:
@@ -28,7 +27,7 @@ datasources:
     minimum-idle: 2
     idle-timeout: 600000
     max-lifetime: 1800000
-
+    
 logger:
   levels:
     io.micronaut.email: TRACE
