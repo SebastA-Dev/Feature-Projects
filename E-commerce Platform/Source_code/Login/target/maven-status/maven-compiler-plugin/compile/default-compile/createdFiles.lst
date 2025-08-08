@@ -1,0 +1,8 @@
+META-INF\micronaut\io.micronaut.inject.BeanDefinitionReference\com.login.DBO.$DBOConnection$Definition
+com\login\DBO\DBOConnection.class
+com\login\Application$Configurer.class
+com\login\DBO\$DBOConnection$Definition.class
+META-INF\swagger\login-0.0.yml
+META-INF\micronaut\io.micronaut.context.ApplicationContextConfigurer\com.login.Application$Configurer
+META-INF\spring-configuration-metadata.json
+com\login\Application.class

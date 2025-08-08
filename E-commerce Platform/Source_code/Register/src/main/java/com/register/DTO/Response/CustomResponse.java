@@ -8,4 +8,6 @@ public interface CustomResponse {
     int getStatus(); // Method to get the status of the response
 
     void setStatus(int status); // Method to set the status in the response
+
+    
 }

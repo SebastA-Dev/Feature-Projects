@@ -25,7 +25,7 @@ A scalable, robust e-commerce web application built using a microservices archit
 
 #### Cloud & Security
 - ☁️ **Cloud Platform**: AWS Cloud
-- 🔐 **Authentication**: OAuth 2.0
+- 🔐 **Authentication**: OAuth 2.0, JWT
 - 📝 **Logging**: Comprehensive logging mechanisms
 
 #### Frontend

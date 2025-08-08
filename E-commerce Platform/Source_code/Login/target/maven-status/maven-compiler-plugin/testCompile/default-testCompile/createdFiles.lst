@@ -1,0 +1,4 @@
+com\login\$LoginTest$Definition$Exec.class
+META-INF\micronaut\io.micronaut.inject.BeanDefinitionReference\com.login.$LoginTest$Definition
+com\login\LoginTest.class
+com\login\$LoginTest$Definition.class

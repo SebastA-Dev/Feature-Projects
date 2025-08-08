@@ -63,18 +63,4 @@ public class UserRegistrationController {
         return new RegistrationResponse("User registered successfully", 200);
     }
 
-    // TODO: Before this implementation, we need to implement the logic for cache
-    // (Dependance on Redis service)
-    @Delete("/delete/user-registration")
-    public String deleteUserRegistration(String username) {
-        return "User registration deleted successfully";
-    }
-
-    // TODO: Before this implementation, we need to implement the logic for cache
-    // (Dependance on Redis service)
-    @Post("/post/user-registration/temporary-data")
-    public String saveTemporaryData(@Body Map<String, String> temporaryData) {
-        return null;
-    }
-
 }

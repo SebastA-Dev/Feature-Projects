@@ -1,10 +1,18 @@
 package com.register.Services;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.util.Dictionary;
 import java.util.Map;
 
+import org.springframework.cglib.core.Local;
+
 import com.register.DB.Repository.UserRepository;
+import com.register.DTO.Request.LoginRequest;
 import com.register.DTO.Request.UserRegistrationRequest;
 
+import io.micronaut.context.annotation.Value;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
@@ -16,6 +24,15 @@ public class UserService {
 
     @Inject
     private UserRepository userRepository;
+
+    @Inject
+    private PasswordService passwordService;
+
+    @Value("${micronaut.session.durationToken}")
+    private long sessionDuration;
+
+    @Value("${micronaut.session.durationRefresh}")
+    private long refreshTokenDuration;
 
     // -------------------------------------------------------------------------
     // User Registration
@@ -61,6 +78,47 @@ public class UserService {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 
+     * Checks if the user login matches any value in the DB.
+     * 
+     * @param login This param represents the user's login information.
+     * @return
+     */
+    public boolean checkUserExistence(LoginRequest login) {
+        Boolean passwordMatching = passwordService.verifyPassword(login.getPassword(),
+                login.getPasswordConfirmation());
+
+        if (!passwordMatching)
+            return false;
+
+        String hashedPassword = hashService.hash(login.getPassword());
+        return userRepository.findUserByUsername(hashedPassword, hashedPassword);
+    }
+
+    /**
+     * Save the user session information.
+     * 
+     * @param login This param represents the user's login information.
+     */
+    public void registerUserSession(LoginRequest login) {
+        LocalDateTime creationDateTime = LocalDateTime.now(ZoneOffset.UTC);
+        LocalDateTime expiresDateTime = creationDateTime.plusMinutes(sessionDuration);
+        LocalDateTime expiresDateTimeRefresh = creationDateTime.plusMinutes(refreshTokenDuration);
+        userRepository.saveUserSession(login.getUsername(), login.getEmail(), creationDateTime, expiresDateTime,
+                expiresDateTimeRefresh);
+    }
+
+    /**
+     * Retrieves desired user UUID.
+     * 
+     * @param loginInformation This param represents the user's login information.
+     * @return
+     */
+    public Dictionary<String, String> getUserUUID(LoginRequest loginInformation) {
+        return userRepository.getUserUUID(loginInformation.getUsername(), loginInformation.getEmail());
     }
 
     // TODO: Implement the methods for the user validation, this should be happen

@@ -5,8 +5,7 @@ micronaut:
       jsonschema:
         paths: classpath:META-INF/schemas
         mapping: /schemas/**
-
-  security:
+  security:  
     hash-configuration:
       type: ARGON2id     
       iterations: 3      
@@ -16,7 +15,10 @@ micronaut:
       salt-length: 16     
   server:
     port: 8080
-
+  session:
+    durationToken: 1800
+    durationRefresh: 1800
+    
 datasources:
   default:
     url: jdbc:mysql://localhost:3306/register?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
