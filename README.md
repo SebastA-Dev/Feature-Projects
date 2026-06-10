@@ -41,22 +41,16 @@ A scalable, robust e-commerce web application built using a microservices archit
 
 ---
 
-# 📦 Project 2: Quantum Chaotic Image Encryption Algorithm
+# 📦 Project 2: Hybrid Quantum-Inspired Image Encryption (DTQW & Galois)
 
 ## 🎯 Project Purpose
-An advanced image encryption system based on **Discrete-Time Quantum Walks (DTQW)**, matrix cascade transformations, and future integration with chaotic attractors and quantum gate systems.
+A high-performance image encryption system utilizing **Discrete-Time Quantum Walks (DTQW)** and **Galois Field ($GF(2^8)$)** arithmetic. The project implements a reversible, block-based encryption pipeline that treats images as algebraic structures, ensuring high diffusion and confusion without data loss.
 
-The project explores modern cryptographic approaches inspired by:
-- Quantum computation
-- Chaotic dynamical systems
-- Matrix-based diffusion models
-- Quantum-inspired randomness generation
-
-Its primary objective is to provide:
-- High diffusion and confusion properties
-- Strong key sensitivity
-- Reversible encryption pipelines
-- Research-oriented experimentation for quantum-chaotic cryptography
+The project explores modern cryptographic approaches combining:
+- Quantum-inspired random walkers (DTQW)
+- Finite Field Arithmetic ($GF(2^8)$)
+- Chaotic dynamical systems (Logistic Map 3D)
+- Block-based matrix cascading
 
 ---
 
@@ -64,140 +58,97 @@ Its primary objective is to provide:
 
 ### Core Technologies
 - 🐍 **Python**
+- 🔢 **Galois Library** ($GF(2^8)$ arithmetic)
+- 📊 **NumPy** (Linear Algebra & Matrix Operations)
 - 📓 **Jupyter Notebook**
-- 🔢 **NumPy**
-- 🧮 **Linear Algebra & Matrix Operations**
 
-### Cryptographic & Mathematical Components
-- ⚛️ **Discrete-Time Quantum Walks (DTQW)**
-- 🔐 **Matrix Cascade Encryption**
-- 🔄 **Orthogonal Matrix Transformations**
-- 🎲 **Pseudo-Random Quantum-Based Key Generation**
-- 🌪️ **Chaotic System Research (Future Integration)**
+### Cryptographic Components
+- ⚛️ **Discrete-Time Quantum Walks (DTQW)** (Permutation layer)
+- 🔐 **Matrix Cascade Encryption** ($GF(2^8)$)
+- 🌀 **Logistic 3D Chaotic Map** (Key & Seed generation)
+- 🔀 **Reversible Block Diffusion**
 
 ### Image Processing
-- 🖼️ RGB Image Channel Manipulation
-- 📊 Floating-Point TIFF Processing
-- 🔀 Spatial Permutation Systems
-- 📦 Block-Based Matrix Encoding
+- 🖼️ RGB Channel Manipulation
+- 📐 Dynamic Block-Size Partitioning ($N \times N$)
+- 🔀 Global Spatial Permutations
 
 ---
 
 ## 🏗️ Encryption Architecture
 
-The encryption system is currently composed of a **7-phase pipeline**:
+The system operates on a **dynamic 7-phase pipeline** that scales to any image dimension:
 
-### Phase 0 — Cryptographic Structure Generation
-- Seed-based cryptographic key generation
-- DTQW-based key evolution
-- RGB channel-specific key derivation
-- Dynamic 4×4 matrix generation
-- Matrix selection using quantum-derived key sequences
+### Phase 0 — Cryptographic Seeding
+- Generation of $X, Y, Z$ sequences from Logistic 3D Map
+- Key derivation for Galois matrices and DTQW permutations
+- Dynamic key scheduling based on image dimensions
 
-### Phase 1 — RGB Channel Separation
+### Phase 1 — RGB Separation
 - Extraction of R, G, and B channels
-- Conversion into floating-point matrix representations
+- Pre-processing for block-based transformation
 
-### Phase 2 — 2D Spatial Permutation
-- Deterministic row permutation
-- Deterministic column permutation
-- Spatial decorrelation across image dimensions
+### Phase 2 — Global Spatial Permutation
+- A-priori decorrelation using $\sigma$ permutations
+- Break down of spatial adjacency (confusion)
 
 ### Phase 3 — Block Transformation
-- Flattening image channels into vectors
-- Padding management
-- Reshaping into 4×N matrix blocks
+- Dynamic partitioning into $N \times N$ blocks
+- Padding management for non-multiple resolutions
+- Galois Field ($GF(2^8)$) array instantiation
 
 ### Phase 4 — Inter-Channel Mixing
-- Orthogonal matrix generation via QR decomposition
-- Cross-channel diffusion between RGB channels
-- Fully reversible transformations
+- Cross-channel diffusion within $GF(2^8)$ space
+- Orthogonal mixing matrices for entropy propagation
 
-### Phase 5 — Cascaded Matrix Encryption
-- Sequential matrix multiplication over encrypted blocks
-- High diffusion propagation
-- Non-linear transformation amplification
+### Phase 5 — Quantum-Inspired Diffusion (DTQW)
+- Application of DTQW-based permutations
+- High-entropy bit shuffling using quantum walk logic
+- Fully reversible bit-level reorganization
 
-### Phase 6 — Reconstruction & Final Permutation
-- Image reconstruction from encrypted blocks
-- Final row and column rotational permutations
-- Quantum-derived permutation key usage
+### Phase 6 — Cascaded Matrix Encryption
+- Sequential multiplication over $GF(2^8)$
+- Deterministic block-wise transformation
+- High-complexity non-linear diffusion
 
-### Phase 7 — Encrypted Output Generation
-- TIFF float64 encrypted image generation
-- Preservation of high-precision encrypted information
+### Phase 7 — Reconstruction & Output
+- Block reassembly to original image geometry
+- Final global permutation layer
+- High-precision output generation
 
 ---
 
-## ⚛️ Quantum Components
+## ⚛️ Quantum-Inspired Components
 
 ### Discrete-Time Quantum Walk (DTQW)
-The current implementation uses DTQW as a quantum-inspired pseudo-random generator for cryptographic key construction.
+Implemented as a deterministic permutation operator over $GF(2^8)$ blocks.
 
-#### Core Concepts
-- Quantum coin operators
-- Conditional shift operators
-- Hilbert space evolution
-- Probability distribution-based key permutation
-
-#### Cryptographic Benefits
-- High parameter sensitivity
-- Strong unpredictability
-- Enhanced confusion properties
-- Deterministic reversibility
+#### Core Logic
+- **Operator-Based Diffusion:** Uses shift and coin operators to map input blocks to a high-entropy state.
+- **Reversibility:** Operates as a unitary-inspired permutation, allowing decryption via the inverse of the shift sequence and key-reversal.
+- **Dynamic Keying:** Each walk is controlled by the state of the 3D Logistic Map, ensuring high sensitivity.
 
 ---
 
-## 🌪️ Future Research Extensions
+## 📊 Evaluation & Cryptographic Metrics
 
-### Quantum Gate Integration
-Planned future implementations include:
+The encryption pipeline is validated through:
 
-- Pauli Gates (X, Y, Z)
-- Hadamard Gates
-- Controlled-NOT (CNOT)
-- Parametrized quantum circuits
-- Multi-coin DTQW systems
-
-### Chaotic Systems
-Future chaotic cryptographic layers may include:
-
-- Lorenz 4D Hyperchaotic Attractors
-- Quantum Logistic Maps
-- Hybrid Lorenz + DTQW architectures
-- Quantum Parrondo Paradox systems
-
----
-
-## 📊 Planned Cryptographic Metrics
-
-The project roadmap includes evaluation using:
-
-- NPCR (Number of Pixels Change Rate)
-- UACI (Unified Average Changing Intensity)
-- Shannon Entropy
-- Pixel Correlation Analysis
-- Histogram Uniformity
-- Key Sensitivity Analysis
-- Encryption Performance Benchmarks
+- **NPCR & UACI:** Measuring avalanche effects in ciphered blocks.
+- **Shannon Entropy:** Validation of information distribution.
+- **Key Sensitivity:** Analysis of decryption failure under minimal seed variation.
+- **Correlation Analysis:** Checking the removal of adjacency patterns between adjacent pixels.
+- **Reversibility Testing:** Verification of bit-perfect reconstruction.
 
 ---
 
 ## 🧠 Research & Design Principles
 
 ### Current Properties
-- Reversible encryption pipeline
-- Matrix-based diffusion
-- Inter-channel entropy propagation
-- Quantum-inspired key generation
-- Deterministic reconstruction
-
-### Future Goals
-- Chaotic attractor integration
-- Fully unitary matrix systems
-- GPU-accelerated encryption
-- Quantum gate-based transformations
-- Advanced cryptographic robustness evaluation
+- **Strict Reversibility:** Every transformation is biyective.
+- **Hybrid Complexity:** Combining algebraic (Galois) and logic (DTQW) diffusion.
+- **Scalable Blocks:** Dynamic $N \times N$ block processing.
+- **Secure Key-Scheduling:** Chaotic 3D seeding.
 
 ---
 
@@ -208,56 +159,13 @@ Feature-Projects/
 │
 ├── e-commerce-platform/
 │   ├── backend/
-│   │   ├── python-services/
-│   │   └── java-services/
 │   ├── frontend/
-│   ├── docs/
 │   └── infrastructure/
 │
 ├── encryption-algorithm/
-│   ├── notebooks/
-│   ├── docs/
-│   ├── research/
-│   ├── experiments/
-│   └── datasets/
+│   ├── notebooks/       # Implementation & Experiments
+│   ├── core/            # DTQW & Galois implementations
+│   ├── experiments/     # Testing different block sizes (N=4, 8, 16)
+│   └── tests/           # Reversibility verification
 │
 └── future-projects/
-```
-
----
-
-## 🚧 Development Roadmap
-
-### E-Commerce Platform
-1. Complete E-Commerce Platform MVP
-2. Implement robust microservices
-3. Develop comprehensive documentation
-4. Set up CI/CD pipelines
-5. Deploy to cloud infrastructure
-
-### Quantum Encryption Algorithm
-1. Finalize reversible decryption pipeline
-2. Validate matrix invertibility guarantees
-3. Implement quantum gate systems
-4. Integrate chaotic attractor generators
-5. Benchmark cryptographic metrics
-6. Optimize matrix operations with GPU acceleration
-7. Publish formal research documentation
-
----
-
-## 📝 Contributing
-*Detailed contributing guidelines will be added*
-
----
-
-## 📄 License
-License will be added soon 🚧
-
----
-
-**Note to Maintainer**:
-- Feel free to expand sections marked with future research or experimental placeholders
-- Maintain the current aesthetic and structure when adding new content
-- Use emojis and concise technical descriptions
-- Keep project documentation modular and scalable
